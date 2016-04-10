@@ -18,8 +18,8 @@ Run bin/magento setup:upgrade
  * Checks Stock Records
  * Checks Visibility
 
-## Is Indexed
-Runs a query to see if the specific product is at a higher version in the index changelog tables than the current version in the mview_state table.  If the product's indexes are not up to date, the indexes are listed.
+* Is Indexed
+ * Runs a query to see if the specific product is at a higher version in the index changelog tables than the current version in the mview_state table.  If the product's indexes are not up to date, the indexes are listed.
 
 ## Future Plans
 Like indexes, we want to know the state of the caches in relation to the specific product.  This includes varnish.
