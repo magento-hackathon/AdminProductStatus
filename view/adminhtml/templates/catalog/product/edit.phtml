@@ -65,14 +65,12 @@
                 <?php endif; ?>
             </div>
             <div class="switcher" style="clear:both;">
-                <?php //Stub for cache validity ?>
-                <?php if (false): ?>
+                <?php if ($block->isFPCValid()): ?>
                     <div style="font-weight:600;font-size:13;text-transform:uppercase;">FPC Status: Valid</div>
                 <?php else : ?>
                     <div style="float:right;font-weight:600;font-size:13;text-transform:uppercase;">FPC Status: <a href="#" id="cache-invalid-link">Invalid</a></div>
                     <div id="cache-invalid-wrapper" style="display:none;">
-                       <?php //Stub for cache information ?>
-                        Cache Information
+                       <?php echo $block->getFPCDetails(); ?>
                     </div>
                 <?php endif; ?>
             </div>

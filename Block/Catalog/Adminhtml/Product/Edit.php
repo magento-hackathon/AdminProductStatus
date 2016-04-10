@@ -132,6 +132,13 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return false;
     }
 
+    public function isFPCValid(){
+        return false;
+    }
+
+    public function getFPCDetails(){
+        return 'Cache Information';
+    }
 
 
 
