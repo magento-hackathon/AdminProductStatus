@@ -11,12 +11,15 @@ namespace MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index;
 class Status implements StatusInterface {
 
     protected $_resource;
+    protected $_indexerFactory;
     protected $connection;
 
     public function __construct(
-        \Magento\Framework\App\ResourceConnection $resource
+        \Magento\Framework\App\ResourceConnection $resource,
+        \Magento\Indexer\Model\IndexerFactory $indexerFactory
     ) {
        $this->_resource = $resource;
+        $this->_indexerFactory = $indexerFactory;
     }
     protected function getConnection()
     {
@@ -28,54 +31,52 @@ class Status implements StatusInterface {
 
 
     public function getNeededIndexes($productId){
-       $rows = $this->getConnection()->fetchAll("
 
-        select 	'catalog_product_price' indexname,
-                (case when ((select max(version_id) from catalog_product_price_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalog_product_price')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'cataloginventory_stock' indexname,
-                (case when ((select max(version_id) from cataloginventory_stock_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'cataloginventory_stock')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'catalog_category_product' indexname,
-                (case when ((select max(version_id) from catalog_category_product_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalog_category_product')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'catalog_product_category' indexname,
-                (case when ((select max(version_id) from catalog_product_category_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalog_product_category')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'catalog_product_attribute' indexname,
-                (case when ((select max(version_id) from catalog_product_attribute_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalog_product_attribute')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'catalogsearch_fulltext' indexname,
-                (case when ((select max(version_id) from catalogsearch_fulltext_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalogsearch_fulltext')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'catalogrule_product' indexname,
-                (case when ((select max(version_id) from catalogrule_product_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalogrule_product')) THEN 1 ELSE 0 END) as needs_index
-        union all
-        select 	'catalogrule_rule' indexname,
-                (case when ((select max(version_id) from catalogrule_rule_cl where entity_id = $productId) >
-                (select version_id from mview_state where view_id = 'catalogrule_rule') ) THEN 1 ELSE 0 END) as needs_index
+        $sql = "";
 
+        $sql = $this->_getSelectPart($sql, 'catalog_product_price', $productId);
+        $sql = $this->_getSelectPart($sql, 'cataloginventory_stock', $productId);
+        $sql = $this->_getSelectPart($sql, 'catalog_category_product', $productId);
+        $sql = $this->_getSelectPart($sql, 'catalog_product_category', $productId);
+        $sql = $this->_getSelectPart($sql, 'catalog_product_attribute', $productId);
+        $sql = $this->_getSelectPart($sql, 'catalogsearch_fulltext', $productId);
+        $sql = $this->_getSelectPart($sql, 'catalogrule_product', $productId);
+        $sql = $this->_getSelectPart($sql, 'catalogrule_rule', $productId);
 
-        ");
 
         $needsIndex = array();
 
-        foreach($rows as $row){
-            if ($row['needs_index']){
-                $needsIndex[] = $row['indexname'];
+        if ($sql) {
+            $rows = $this->getConnection()->fetchAll($sql);
+
+            foreach ($rows as $row) {
+                if ($row['needs_index']) {
+                    $needsIndex[] = $row['indexname'];
+                }
             }
         }
-
         return $needsIndex;
 
     }
 
+    private function _getAddUnion($sql){
+        if ($sql) {
+            $sql .= " union all ";
+        }
+        return $sql;
+    }
+
+    private function _getSelectPart($sql, $indexer, $productId){
+        if ($this->_indexerFactory->create()->load($indexer)->isScheduled()) {
+            $sql = $this->_getAddUnion($sql);
+            $sql .= "select '$indexer' indexname,
+                (case
+                  when (
+                    ((select max(version_id) from $indexer"."_cl where entity_id = $productId) > (select version_id from mview_state where view_id = '$indexer'))
+                       or ((select max(version_id) from catalog_product_price_cl where entity_id = $productId) is not null and ((select version_id from mview_state where view_id = 'catalog_product_price') is null))
+                  ) THEN 1 ELSE 0 END) as needs_index";
+        }
+        return $sql;
+    }
 
 }
