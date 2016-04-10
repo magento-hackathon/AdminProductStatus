@@ -14,9 +14,9 @@ Run bin/magento setup:upgrade
 
 ##Information Displayed
 * Is Visible
-** Sets the scope of the product to a specific store, and checks if the product is salable.
-** Checks Stock Records
-** Checks Visibility
+ * Sets the scope of the product to a specific store, and checks if the product is salable.
+ * Checks Stock Records
+ * Checks Visibility
 
 ## Is Indexed
 Runs a query to see if the specific product is at a higher version in the index changelog tables than the current version in the mview_state table.  If the product's indexes are not up to date, the indexes are listed.
