@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Catalog\Block\Adminhtml\Product\Edit" type="MagentoHackathon\AdminProductStatus\Block\Catalog\Adminhtml\Product\Edit"/>
+    <preference for="MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index\StatusInterface" type="MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index\Status"/>
 </config>

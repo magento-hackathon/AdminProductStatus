@@ -54,6 +54,11 @@
                 Yes
             <?php else : ?>
                 No
+
+                    <?php foreach($block->getNeededIndexes() as $i => $indexName): ?>
+                        <div><?php echo $indexName ?> </div>
+                    <?php endforeach; ?>
+
             <?php endif; ?>
         </div>
 

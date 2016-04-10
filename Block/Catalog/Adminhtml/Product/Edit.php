@@ -22,6 +22,8 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
     protected $_productRepository = null;
     protected $_stockRegistry = null;
     protected $_productInStoreScope = null;
+    protected $_indexStatus = null;
+    protected $_neededIndexes = null;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
@@ -40,10 +42,12 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         \Magento\Catalog\Helper\Product $productHelper,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
+        \MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index\StatusInterface $indexStatus,
         array $data = []
     ) {
         $this->_productRepository = $productRepository;
         $this->_stockRegistry = $stockRegistry;
+        $this->_indexStatus = $indexStatus;
         parent::__construct($context, $jsonEncoder, $attributeSetFactory, $registry, $productHelper, $data);
     }
 
@@ -71,10 +75,24 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return $this->_getProductInStoreScope($this->getProduct()->getId(), 1)->getVisibility();
     }
 
+    public function getNeededIndexes(){
+        if ($this->_neededIndexes == null) {
+            $this->_neededIndexes = $this->_indexStatus->getNeededIndexes($this->getProduct()->getId());
+        }
+        return $this->_neededIndexes;
+    }
+
     public function isIndexed(){
-        //Get a model
-        //call ->needsIndex($product)
+        $indexes = $this->getNeededIndexes();
+        if (empty($indexes)){
+            return true;
+        }
         return false;
     }
+
+
+
+
+
 
 }
