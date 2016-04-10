@@ -59,16 +59,11 @@ class Status implements StatusInterface {
 
     }
 
-    private function _getAddUnion($sql){
-        if ($sql) {
-            $sql .= " union all ";
-        }
-        return $sql;
-    }
-
     private function _getSelectPart($sql, $indexer, $productId){
         if ($this->_indexerFactory->create()->load($indexer)->isScheduled()) {
-            $sql = $this->_getAddUnion($sql);
+            if ($sql) {
+                $sql .= " union all ";
+            }
             $sql .= "select '$indexer' indexname,
                 (case
                   when (

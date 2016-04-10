@@ -34,34 +34,36 @@
                    data-text-off="<?php /* @escapeNotVerified */ echo __('Product offline'); ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Product online status'); ?>"></label>
         </div>
-        <div class="switcher" style="clear:both;">
-            Is Visible:
-            <?php if ($block->isVisibleOnFrontend()): ?>
-                Yes
-            <?php else : ?>
-                No
-                <div>
-                    In Stock: <?php echo ($block->isInStock() ? 'Yes' : 'No') ?>
-                </div>
-                <div>
-                    Visibility: <?php echo $block->getVisibility() ?>
-                </div>
-            <?php endif; ?>
-        </div>
-        <div class="switcher" style="clear:both;">
-            Is Indexed:
-            <?php if ($block->isIndexed()): ?>
-                Yes
-            <?php else : ?>
-                No
 
-                    <?php foreach($block->getNeededIndexes() as $i => $indexName): ?>
-                        <div><?php echo $indexName ?> </div>
-                    <?php endforeach; ?>
+        <?php if ($block->getStoreScope()): ?>
+            <div class="switcher" style="clear:both;">
+                Is Visible:
+                <?php if ($block->isVisibleOnFrontend()): ?>
+                    Yes
+                <?php else : ?>
+                    No
+                    <div>
+                        In Stock: <?php echo ($block->isInStock() ? 'Yes' : 'No') ?>
+                    </div>
+                    <div>
+                        Visibility: <?php echo $block->getVisibility() ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="switcher" style="clear:both;">
+                Is Indexed:
+                <?php if ($block->isIndexed()): ?>
+                    Yes
+                <?php else : ?>
+                    No
 
-            <?php endif; ?>
-        </div>
+                        <?php foreach($block->getNeededIndexes() as $i => $indexName): ?>
+                            <div><?php echo $indexName ?> </div>
+                        <?php endforeach; ?>
 
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
         <?php if ($block->getProductId()): ?>
             <?php echo $block->getDeleteButtonHtml() ?>
         <?php endif; ?>

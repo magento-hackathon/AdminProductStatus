@@ -43,6 +43,7 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index\StatusInterface $indexStatus,
+
         array $data = []
     ) {
         $this->_productRepository = $productRepository;
@@ -51,20 +52,32 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         parent::__construct($context, $jsonEncoder, $attributeSetFactory, $registry, $productHelper, $data);
     }
 
-    //@todo put this into the child block
-
-    protected function _getProductInStoreScope($id, $store){
+    protected function _getProductInStoreScope($id){
+        $store = $this->getStoreScope();
+        if (!$store){
+            throw new Exception("No store scope available.");
+        }
         if ($this->_productInStoreScope == null) {
-            $this->_productInStoreScope = $this->_productRepository->getById($id, false, $store);
+            $this->_productInStoreScope = $this->_productRepository->getById($id, false, $store->getId());
         }
         return $this->_productInStoreScope;
     }
 
+    public function getStoreScope(){
+        $store = false;
+        if ($this->_storeManager->isSingleStoreMode()){
+            $store = $this->_storeManager->getDefaultStoreView();
+        } else if ($storeId = $this->getRequest()->getParam('store')) {
+            $store = $this->_storeManager->getStore($storeId);
+        }
+        return $store;
+    }
+
     public function isVisibleOnFrontend(){
-        return $this->_getProductInStoreScope($this->getProduct()->getId(), 1)->isSalable();
+        return $this->_getProductInStoreScope($this->getProduct()->getId())->isSalable();
     }
     public function isInStock(){
-        $product = $this->_getProductInStoreScope($this->getProduct()->getId(), 1);
+        $product = $this->_getProductInStoreScope($this->getProduct()->getId());
         $stockItem = $this->_stockRegistry->getStockItem(
             $product->getId(),
             $product->getStore()->getWebsiteId()
@@ -72,7 +85,7 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return $stockItem->getIsInStock();
     }
     public function getVisibility(){
-        return $this->_getProductInStoreScope($this->getProduct()->getId(), 1)->getVisibility();
+        return $this->_getProductInStoreScope($this->getProduct()->getId())->getVisibility();
     }
 
     public function getNeededIndexes(){
