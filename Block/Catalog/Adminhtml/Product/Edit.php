@@ -7,7 +7,7 @@
 /**
  * Customer edit block
  *
- * @author      Magento Core Team <core@magentocommerce.com>
+ * @author  Imagine 2016 Hackathon
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 namespace MagentoHackathon\AdminProductStatus\Block\Catalog\Adminhtml\Product;
@@ -32,6 +32,8 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Catalog\Helper\Product $productHelper
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     * @param \MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index\StatusInterface $indexStatus
      * @param array $data
      */
     public function __construct(
@@ -43,7 +45,6 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index\StatusInterface $indexStatus,
-
         array $data = []
     ) {
         $this->_productRepository = $productRepository;
@@ -52,6 +53,11 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         parent::__construct($context, $jsonEncoder, $attributeSetFactory, $registry, $productHelper, $data);
     }
 
+    /**
+     * @param $id
+     * @return \Magento\Catalog\Api\Data\ProductInterface|null
+     * @throws Exception
+     */
     protected function _getProductInStoreScope($id){
         $store = $this->getStoreScope();
         if (!$store){
@@ -63,6 +69,9 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return $this->_productInStoreScope;
     }
 
+    /**
+     * @return bool|\Magento\Store\Api\Data\StoreInterface|null
+     */
     public function getStoreScope(){
         $store = false;
         if ($this->_storeManager->hasSingleStore()){
@@ -73,9 +82,18 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return $store;
     }
 
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     public function isVisibleOnFrontend(){
         return $this->_getProductInStoreScope($this->getProduct()->getId())->isSalable();
     }
+
+    /**
+     * @return bool|int
+     * @throws Exception
+     */
     public function isInStock(){
         $product = $this->_getProductInStoreScope($this->getProduct()->getId());
         $stockItem = $this->_stockRegistry->getStockItem(
@@ -84,10 +102,18 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         );
         return $stockItem->getIsInStock();
     }
+
+    /**
+     * @return int|null
+     * @throws Exception
+     */
     public function getVisibility(){
         return $this->_getProductInStoreScope($this->getProduct()->getId())->getVisibility();
     }
 
+    /**
+     * @return null
+     */
     public function getNeededIndexes(){
         if ($this->_neededIndexes == null) {
             $this->_neededIndexes = $this->_indexStatus->getNeededIndexes($this->getProduct()->getId());
@@ -95,6 +121,9 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return $this->_neededIndexes;
     }
 
+    /**
+     * @return bool
+     */
     public function isIndexed(){
         $indexes = $this->getNeededIndexes();
         if (empty($indexes)){

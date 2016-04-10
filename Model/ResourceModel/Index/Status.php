@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: brobie
- * Date: 4/9/16
- * Time: 8:39 PM
+ * Index status - gets the status of an index by product
+ *
+ * @author  Imagine 2016 Hackathon
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 
 namespace MagentoHackathon\AdminProductStatus\Model\ResourceModel\Index;
@@ -14,6 +14,11 @@ class Status implements StatusInterface {
     protected $_indexerFactory;
     protected $connection;
 
+    /**
+     * Status constructor.
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param \Magento\Indexer\Model\IndexerFactory $indexerFactory
+     */
     public function __construct(
         \Magento\Framework\App\ResourceConnection $resource,
         \Magento\Indexer\Model\IndexerFactory $indexerFactory
@@ -21,6 +26,10 @@ class Status implements StatusInterface {
        $this->_resource = $resource;
         $this->_indexerFactory = $indexerFactory;
     }
+
+    /**
+     * @return \Magento\Framework\DB\Adapter\AdapterInterface
+     */
     protected function getConnection()
     {
         if (!$this->connection) {
@@ -29,7 +38,10 @@ class Status implements StatusInterface {
         return $this->connection;
     }
 
-
+    /**
+     * @param $productId
+     * @return array
+     */
     public function getNeededIndexes($productId){
 
         $sql = "";
@@ -59,6 +71,12 @@ class Status implements StatusInterface {
 
     }
 
+    /**
+     * @param $sql
+     * @param $indexer
+     * @param $productId
+     * @return string
+     */
     private function _getSelectPart($sql, $indexer, $productId){
         if ($this->_indexerFactory->create()->load($indexer)->isScheduled()) {
             if ($sql) {
