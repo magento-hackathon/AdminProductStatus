@@ -37,30 +37,43 @@
 
         <?php if ($block->getStoreScope()): ?>
             <div class="switcher" style="clear:both;">
-                Is Visible:
+
                 <?php if ($block->isVisibleOnFrontend()): ?>
-                    Yes
+                <div style="font-weight:600;font-size:13;text-transform:uppercase;">Is Visible: Yes</div>
                 <?php else : ?>
-                    No
-                    <div>
-                        In Stock: <?php echo ($block->isInStock() ? 'Yes' : 'No') ?>
-                    </div>
-                    <div>
-                        Visibility: <?php echo $block->getVisibility() ?>
+                    <div style="float:right;font-weight:600;font-size:13;text-transform:uppercase;">Is Visible: <a href="#" id="visibility-no-link">No</a></div>
+                    <div id="visibility-no-wrapper" style="display:none;">
+                        <div>
+                            In Stock: <?php echo ($block->isInStock() ? 'Yes' : 'No') ?>
+                        </div>
+                        <div>
+                            Visibility: <?php echo $block->getVisibility() ?>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
             <div class="switcher" style="clear:both;">
-                Is Indexed:
                 <?php if ($block->isIndexed()): ?>
-                    Yes
+                    <div style="font-weight:600;font-size:13;text-transform:uppercase;">Is Indexed: Yes</div>
                 <?php else : ?>
-                    No
-
+                    <div style="float:right;font-weight:600;font-size:13;text-transform:uppercase;">Is Indexed: <a href="#" id="index-no-link">No</a></div>
+                    <div id="index-no-wrapper" style="display:none;">
                         <?php foreach($block->getNeededIndexes() as $i => $indexName): ?>
                             <div><?php echo $indexName ?> </div>
                         <?php endforeach; ?>
-
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="switcher" style="clear:both;">
+                <?php //Stub for cache validity ?>
+                <?php if (false): ?>
+                    <div style="font-weight:600;font-size:13;text-transform:uppercase;">FPC Status: Valid</div>
+                <?php else : ?>
+                    <div style="float:right;font-weight:600;font-size:13;text-transform:uppercase;">FPC Status: <a href="#" id="cache-invalid-link">Invalid</a></div>
+                    <div id="cache-invalid-wrapper" style="display:none;">
+                       <?php //Stub for cache information ?>
+                        Cache Information
+                    </div>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -434,7 +447,37 @@
             });
 
         });
+        $("#visibility-no-wrapper").hide();
+        $("#visibility-no-link").click(function(){
+            if ($("#visibility-no-wrapper").is(':visible')) {
+                $("#visibility-no-wrapper").hide();
+            } else {
+                $("#visibility-no-wrapper").show();
+            }
+        });
+
+        $("#index-no-wrapper").hide();
+        $("#index-no-link").click(function(){
+            if ($("#index-no-wrapper").is(':visible')) {
+                $("#index-no-wrapper").hide();
+            } else {
+                $("#index-no-wrapper").show();
+            }
+        });
+
+        $("#cache-invalid-wrapper").hide();
+        $("#cache-invalid-link").click(function(){
+            if ($("#cache-invalid-wrapper").is(':visible')) {
+                $("#cache-invalid-wrapper").hide();
+            } else {
+                $("#cache-invalid-wrapper").show();
+            }
+        });
+
     });
+
+
+
 </script>
 <script type="text/x-magento-init">
     {
