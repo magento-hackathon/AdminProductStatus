@@ -65,7 +65,7 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
 
     public function getStoreScope(){
         $store = false;
-        if ($this->_storeManager->isSingleStoreMode()){
+        if ($this->_storeManager->hasSingleStore()){
             $store = $this->_storeManager->getDefaultStoreView();
         } else if ($storeId = $this->getRequest()->getParam('store')) {
             $store = $this->_storeManager->getStore($storeId);
