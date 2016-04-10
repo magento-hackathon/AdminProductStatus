@@ -133,6 +133,7 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
     }
 
     public function isFPCValid(){
+        $url = $this->_getProductUrl();
         return false;
     }
 
@@ -140,6 +141,10 @@ class Edit extends \Magento\Catalog\Block\Adminhtml\Product\Edit
         return 'Cache Information';
     }
 
+    protected function _getProductUrl(){
+        $product = $this->_getProductInStoreScope($this->getProduct()->getId());
+        return $product->getUrlModel()->getUrl($product);
+    }
 
 
 
